@@ -1,0 +1,62 @@
+
+all excels
+all resumes
+
+# ===== SENSITIVE CONFIG FILES =====
+config/secrets.py
+config/personals.py
+config/questions.py
+
+# If config files have multiple versions:
+config/*secrets*.py
+config/*personal*.py
+
+# ===== PYTHON CACHE =====
+__pycache__/
+*.pyc
+*.pyo
+
+# ===== SELENIUM / CHROMEDRIVER =====
+chromedriver*
+chromedriver.exe
+chromedriver-win64/
+chromedriver-linux64/
+chromedriver-mac-arm64/
+chromedriver-mac-x64/
+
+# ===== LOGS & TEMP FILES =====
+logs/
+*.log
+*.tmp
+
+# ===== VENV =====
+venv/
+env/
+.venv/
+
+# ===== OS FILES =====
+Thumbs.db
+.DS_Store
+
+# ===== BACKUP / IDEA FILES =====
+*.bak
+*.swp
+*.zip
+*.rar
+.vscode/
+.idea/
+
+# ===== DATABASE & CSV (Sensitive job history) =====
+applied_jobs.csv
+applied_jobs.json
+job_history.csv
+
+# ===== AI Provider Keys (If saved separately) =====
+*.key
+*.env
+.env.local
+
+# ===== Browser Profiles =====
+selenium_profile/
+browser_profiles/
+user_data/

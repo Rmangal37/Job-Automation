@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Applied Jobs Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/a2b5c68b84.js" crossorigin="anonymous"></script>
+  <style>
+    body {
+      background-color: #f7f9fc;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .navbar {
+      background: linear-gradient(90deg, #0d6efd, #00bfff);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .navbar-brand {
+      color: white;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+    }
+    .card {
+      border-radius: 15px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    table {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: default;
+    }
+    th {
+      background-color: #e9f1ff;
+      color: #333;
+    }
+    tr:hover {
+      background-color: #f5faff;
+      transition: 0.3s;
+    }
+    .search-container {
+      position: relative;
+      max-width: 300px;
+    }
+    .search-container i {
+      position: absolute;
+      top: 10px;
+      left: 12px;
+      color: #6c757d;
+    }
+    .search-container input {
+      padding-left: 35px;
+    }
+    .sort-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sort-container label {
+      font-weight: 500;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg px-4">
+  <a class="navbar-brand" href="#"><i class="fa-solid fa-briefcase me-2"></i>Job Application Tracker</a>
+</nav>
+
+<div class="container mt-4">
+  <!-- Summary cards -->
+  <div class="row mb-4 text-center">
+    <div class="col-md-4">
+      <div class="card p-3">
+        <h6>Total Applications</h6>
+        <h3>{{ total }}</h3>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card p-3">
+        <h6>Unique Companies</h6>
+        <h3>{{ jobs|map(attribute='Company')|unique|list|length }}</h3>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card p-3">
+        <h6>Last Application</h6>
+        <h5>
+          {% if jobs %}
+            {{ jobs[-1]['Date Applied'] }}
+          {% else %}
+            N/A
+          {% endif %}
+        </h5>
+      </div>
+    </div>
+  </div>
+
+  <!-- Controls: Sort + Search -->
+  <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <h4>Applied Jobs History</h4>
+    <div class="sort-container">
+      <label for="sortSelect"><i class="fa-solid fa-sort me-1 text-primary"></i>Sort by:</label>
+      <select id="sortSelect" class="form-select form-select-sm" style="width: 180px;">
+        <option value="none" selected>Default</option>
+        <option value="Date Applied">Date Applied</option>
+        <option value="Company">Company Name</option>
+        <option value="Title">Job Title</option>
+        <option value="Status">Status</option>
+      </select>
+    </div>
+    <div class="search-container">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="searchInput" class="form-control" placeholder="Search job title or company...">
+    </div>
+  </div>
+
+  <!-- Job table -->
+  <table class="table table-hover text-center align-middle" id="jobsTable">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Job Title</th>
+        <th>Company</th>
+        <th>Location</th>
+        <th>Date Applied</th>
+        <th>HR Contact</th>
+        <th>Status</th> 
+      </tr>
+    </thead>
+    <tbody id="jobTable">
+      {% for job in jobs %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td><i class="fa-solid fa-briefcase me-2 text-primary"></i>{{ job['Title'] }}</td>
+        <td><i class="fa-solid fa-building me-2 text-secondary"></i>{{ job['Company'] }}</td>
+        <td><i class="fa-solid fa-location-dot me-2 text-danger"></i>{{ job['Location'] or 'N/A' }}</td>
+        <td>{{ job['Date Applied'] or 'N/A' }}</td>
+        <td>
+          {% if job['HR Link'] %}
+            <a href="{{ job['HR Link'] }}" target="_blank">
+              <i class="fa-solid fa-user-tie me-1 text-info"></i>{{ job['HR Name'] }}
+            </a>
+          {% else %}
+            {{ job['HR Name'] or 'N/A' }}
+          {% endif %}
+        </td>
+        <td>
+          {% set status = job['Status']|lower if job['Status'] else 'success' %}
+          {% if 'success' in status %}
+            <span class="badge bg-success">Success</span>
+          {% elif 'pending' in status or 'progress' in status %}
+            <span class="badge bg-warning text-dark">Pending</span>
+          {% elif 'reject' in status or 'fail' in status %}
+            <span class="badge bg-danger">Rejected</span>
+          {% else %}
+            <span class="badge bg-secondary">N/A</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- JS: Search + Sort -->
+<script>
+  // Search functionality
+  const searchInput = document.getElementById("searchInput");
+  searchInput.addEventListener("keyup", function() {
+    const filter = this.value.toLowerCase();
+    const rows = document.querySelectorAll("#jobTable tr");
+    rows.forEach(row => {
+      const text = row.textContent.toLowerCase();
+      row.style.display = text.includes(filter) ? "" : "none";
+    });
+  });
+
+  // Sort functionality
+  document.getElementById("sortSelect").addEventListener("change", function() {
+    const sortBy = this.value;
+    if (sortBy === "none") return;
+
+    const table = document.getElementById("jobsTable");
+    const tbody = table.querySelector("tbody");
+    const rows = Array.from(tbody.querySelectorAll("tr"));
+
+    const indexMap = {
+      "Title": 1,
+      "Company": 2,
+      "Location": 3,
+      "Date Applied": 4,
+      "Status": 6
+    };
+
+    const colIndex = indexMap[sortBy];
+    rows.sort((a, b) => {
+      const aText = a.children[colIndex].textContent.trim().toLowerCase();
+      const bText = b.children[colIndex].textContent.trim().toLowerCase();
+      if (sortBy === "Date Applied") {
+        // Handle date sorting
+        const dateA = new Date(aText);
+        const dateB = new Date(bText);
+        return dateB - dateA; // newest first
+      }
+      return aText.localeCompare(bText);
+    });
+
+    tbody.innerHTML = "";
+    rows.forEach(r => tbody.appendChild(r));
+  });
+</script>
+
+</body>
+</html>
