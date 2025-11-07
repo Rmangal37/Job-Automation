@@ -2,8 +2,8 @@
 (Automated Job Application Bot + Job Dashboard) 
 
 This project automates the LinkedIn job application process using Python, Selenium, and ChromeDriver, and records all applied jobs inside a Flask-based dashboard.
-It eliminates repetitive manual applications, ensures accuracy, and allows job seekers to track all applications visually.
-
+It eliminates repetitive manual applications, ensures accuracy, and allows job seekers to track all applications visually.       
+   
 ✅ Features
 
 🔹 Automated LinkedIn Login
@@ -24,7 +24,10 @@ It eliminates repetitive manual applications, ensures accuracy, and allows job s
 
 🔹 Config-driven behavior (edit without touching code)
 
-🔹 Optional AI integration (resume/cover-letter generation)
+🔹 Optional AI integration (resume/cover-letter generation)          
+
+
+
 
 
 📁 Project Structure
